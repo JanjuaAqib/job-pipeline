@@ -21,6 +21,9 @@ jobs:
           node-version: "20"
 
       - name: Fetch and rank jobs
+        env:
+          ADZUNA_APP_ID: ${{ secrets.ADZUNA_APP_ID }}
+          ADZUNA_APP_KEY: ${{ secrets.ADZUNA_APP_KEY }}
         run: node fetch-jobs.js
 
       - name: Commit updated jobs.json
