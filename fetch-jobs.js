@@ -1,7 +1,20 @@
-// fetch-jobs.js — runs on GitHub Actions servers (Node 20+, no CORS).
-// Pulls jobs from Arbeitnow, ranks them against Aqib's profile, writes jobs.json.
+// fetch-jobs.js — runs on GitHub Actions (Node 20+, no CORS).
+// Sources: Arbeitnow (EU sponsorship/remote) + Adzuna (UK + 8 EU countries, ALL roles).
+// Merges, dedupes, ranks against Aqib's profile, writes jobs.json.
 
 const fs = require("fs");
+
+const ADZUNA_ID  = process.env.ADZUNA_APP_ID;
+const ADZUNA_KEY = process.env.ADZUNA_APP_KEY;
+
+// Adzuna country codes to pull. UK ("gb") = all roles, not just sponsorship.
+const ADZUNA_COUNTRIES = ["gb","de","nl","fr","es","it","be","at","ch"];
+
+// Search terms aimed at Aqib's target roles. Adzuna searches title+description.
+const SEARCH_TERMS = [
+  "product manager","product owner","delivery manager",
+  "associate product manager","producer","project manager"
+];
 
 const PROFILE = {
   titles: ["product manager","product owner","delivery manager","program manager",
@@ -30,33 +43,93 @@ function score(job){
   return {score:s, why, sponsor: sp.length>0};
 }
 
-async function getPage(p){
-  const r = await fetch("https://www.arbeitnow.com/api/job-board-api?page="+p, {
-    headers: { "User-Agent": "job-pipeline-personal" }
-  });
+// ---------- Arbeitnow ----------
+async function fetchArbeitnow(){
+  const out=[];
+  for(let p=1;p<=5;p++){
+    try{
+      const r=await fetch("https://www.arbeitnow.com/api/job-board-api?page="+p,
+        {headers:{"User-Agent":"job-pipeline-personal"}});
+      if(!r.ok) throw new Error("HTTP "+r.status);
+      const j=await r.json();
+      (j.data||[]).forEach(x=>out.push({
+        title:x.title, company_name:x.company_name, location:x.location,
+        url:x.url, remote:!!x.remote, tags:x.tags||[],
+        description:x.description||"", source:"Arbeitnow", country:"EU"
+      }));
+    }catch(e){ console.error("Arbeitnow p"+p+":",e.message); }
+  }
+  return out;
+}
+
+// ---------- Adzuna ----------
+async function fetchAdzunaCountry(cc, term){
+  const url="https://api.adzuna.com/v1/api/jobs/"+cc+"/search/1"
+    +"?app_id="+encodeURIComponent(ADZUNA_ID)
+    +"&app_key="+encodeURIComponent(ADZUNA_KEY)
+    +"&results_per_page=50"
+    +"&what="+encodeURIComponent(term)
+    +"&max_days_old=30"
+    +"&content-type=application/json";
+  const r=await fetch(url);
   if(!r.ok) throw new Error("HTTP "+r.status);
-  const j = await r.json();
-  return j.data || [];
+  const j=await r.json();
+  return (j.results||[]).map(x=>({
+    title:x.title||"",
+    company_name:(x.company&&x.company.display_name)||"",
+    location:(x.location&&x.location.display_name)||cc.toUpperCase(),
+    url:x.redirect_url||"",
+    remote:/remote/i.test((x.title||"")+(x.description||"")),
+    tags:[(x.category&&x.category.label)||""].filter(Boolean),
+    description:x.description||"",
+    source:"Adzuna", country:cc.toUpperCase()
+  }));
+}
+
+async function fetchAdzuna(){
+  if(!ADZUNA_ID||!ADZUNA_KEY){ console.error("No Adzuna keys set — skipping Adzuna."); return []; }
+  const out=[];
+  for(const cc of ADZUNA_COUNTRIES){
+    for(const term of SEARCH_TERMS){
+      try{
+        const rows=await fetchAdzunaCountry(cc,term);
+        out.push(...rows);
+        await new Promise(r=>setTimeout(r,250)); // be gentle on rate limit
+      }catch(e){ console.error("Adzuna "+cc+"/"+term+":",e.message); }
+    }
+  }
+  return out;
+}
+
+function dedupe(jobs){
+  const seen=new Set(), out=[];
+  for(const j of jobs){
+    const key=((j.title||"")+"|"+(j.company_name||"")+"|"+((j.location||"").split(",")[0])).toLowerCase();
+    if(seen.has(key)) continue;
+    seen.add(key); out.push(j);
+  }
+  return out;
 }
 
 (async () => {
-  let all = [];
-  for(let p=1; p<=5; p++){
-    try { all = all.concat(await getPage(p)); }
-    catch(e){ console.error("page "+p+" failed:", e.message); }
-  }
+  const [arb, adz] = await Promise.all([fetchArbeitnow(), fetchAdzuna()]);
+  console.log("Arbeitnow:",arb.length," Adzuna:",adz.length);
 
-  const ranked = all.map(j => {
-    const sc = score(j);
-    return { ...j, _score: sc.score, _why: sc.why, _sponsor: sc.sponsor };
-  }).sort((a,b)=> b._score - a._score);
+  let all = dedupe(arb.concat(adz));
+
+  const ranked = all.map(j=>{
+    const sc=score(j);
+    return { ...j, _score:sc.score, _why:sc.why, _sponsor:sc.sponsor };
+  })
+  .filter(j=> j._score >= 18)          // drop near-irrelevant noise
+  .sort((a,b)=> b._score - a._score);
 
   const out = {
     generated_at: new Date().toISOString(),
     count: ranked.length,
-    jobs: ranked.slice(0, 150)
+    sources: ["Arbeitnow", "Adzuna ("+ADZUNA_COUNTRIES.join(",")+")"],
+    jobs: ranked.slice(0, 250)
   };
-
   fs.writeFileSync("jobs.json", JSON.stringify(out, null, 2));
-  console.log("Wrote jobs.json with "+out.jobs.length+" jobs at "+out.generated_at);
+  console.log("Wrote jobs.json with "+out.jobs.length+" jobs.");
 })();
