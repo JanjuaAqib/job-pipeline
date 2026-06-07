@@ -1,0 +1,32 @@
+name: Update jobs daily
+
+on:
+  schedule:
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Fetch and rank jobs
+        run: node fetch-jobs.js
+
+      - name: Commit updated jobs.json
+        run: |
+          git config user.name "job-bot"
+          git config user.email "job-bot@users.noreply.github.com"
+          git add jobs.json
+          git commit -m "Update jobs" || echo "No changes"
+          git push
