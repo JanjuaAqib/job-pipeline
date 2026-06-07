@@ -6,7 +6,6 @@
 <title>Job Pipeline — PM / PO / Delivery</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
-
   :root{
     --bg:#0e1116; --panel:#161b22; --panel2:#1c232d; --line:#283140;
     --ink:#e8edf2; --muted:#8b97a7; --accent:#ffd23f; --accent2:#3ddc97;
@@ -18,25 +17,20 @@
     background-image:radial-gradient(circle at 15% 10%,rgba(255,210,63,.06),transparent 40%),radial-gradient(circle at 85% 90%,rgba(61,220,151,.05),transparent 40%);
     min-height:100vh;padding:24px 16px;}
   .wrap{max-width:1040px;margin:0 auto}
-  header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px;border-bottom:1px solid var(--line);padding-bottom:20px;margin-bottom:8px}
+  header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px;border-bottom:1px solid var(--line);padding-bottom:20px}
   h1{font-family:var(--disp);font-weight:900;font-size:clamp(28px,5vw,44px);line-height:.95;letter-spacing:-.02em}
   h1 em{font-style:italic;color:var(--accent)}
-  .sub{color:var(--muted);font-size:14px;margin-top:8px;max-width:520px;line-height:1.5}
+  .sub{color:var(--muted);font-size:14px;margin-top:8px;max-width:560px;line-height:1.5}
   .tag-mono{font-family:var(--mono);font-size:11px;color:var(--accent2);text-transform:uppercase;letter-spacing:.15em}
-
+  .freshness{font-family:var(--mono);font-size:12px;color:var(--muted);margin-top:8px}
   .controls{display:flex;flex-wrap:wrap;gap:10px;margin:24px 0 18px;align-items:center}
   .controls input[type=text]{background:var(--panel);border:1px solid var(--line);color:var(--ink);padding:10px 14px;border-radius:10px;font-family:var(--mono);font-size:13px;flex:1;min-width:200px}
   .chip{background:var(--panel);border:1px solid var(--line);color:var(--muted);padding:8px 14px;border-radius:999px;font-size:12px;cursor:pointer;font-family:var(--mono);transition:.15s;user-select:none}
   .chip.on{background:var(--accent);color:#0e1116;border-color:var(--accent);font-weight:600}
-  .btn{background:var(--accent2);color:#08120d;border:none;padding:10px 18px;border-radius:10px;font-weight:600;cursor:pointer;font-family:var(--mono);font-size:13px;transition:.15s}
-  .btn:hover{filter:brightness(1.1)}
-  .btn:disabled{opacity:.5;cursor:wait}
-
   .stats{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}
   .stat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 16px;flex:1;min-width:120px}
   .stat .n{font-family:var(--disp);font-size:28px;font-weight:900}
   .stat .l{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;font-family:var(--mono)}
-
   .job{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:12px;transition:.15s;position:relative;overflow:hidden}
   .job:hover{border-color:#3a4659;transform:translateY(-1px)}
   .job .score{position:absolute;top:0;right:0;background:var(--panel2);font-family:var(--mono);font-size:11px;padding:6px 12px;border-bottom-left-radius:10px;color:var(--accent)}
@@ -48,17 +42,15 @@
   .b-spons{color:var(--spons);border-color:var(--spons);background:rgba(255,122,89,.08)}
   .b-uk{color:var(--uk);border-color:var(--uk);background:rgba(180,140,255,.08)}
   .b-tag{color:var(--muted);border-color:var(--line)}
+  .b-src{color:#7fe3c0;border-color:#2f6f5b;background:rgba(61,220,151,.07)}
   .job .why{font-size:12.5px;color:#a9b6c6;line-height:1.5;margin-bottom:12px}
-  .job .why b{color:var(--accent2)}
   .actions{display:flex;gap:8px;flex-wrap:wrap}
   .actions a,.actions button{font-family:var(--mono);font-size:12px;padding:8px 14px;border-radius:8px;text-decoration:none;cursor:pointer;border:1px solid var(--line);background:var(--panel2);color:var(--ink);transition:.15s}
   .actions a.apply{background:var(--accent);color:#0e1116;border-color:var(--accent);font-weight:600}
   .actions a:hover,.actions button:hover{filter:brightness(1.15)}
   .actions button.done{background:rgba(61,220,151,.15);border-color:var(--accent2);color:var(--accent2)}
-
-  .empty{text-align:center;color:var(--muted);padding:60px 20px;font-family:var(--mono);font-size:14px}
+  .empty{text-align:center;color:var(--muted);padding:60px 20px;font-family:var(--mono);font-size:14px;line-height:1.6}
   .loader{text-align:center;padding:50px;font-family:var(--mono);color:var(--accent)}
-  .note{background:rgba(255,122,89,.06);border:1px solid rgba(255,122,89,.25);border-radius:10px;padding:12px 16px;font-size:12.5px;color:#c9b4ab;margin-bottom:18px;line-height:1.5}
   footer{margin-top:30px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:11px;font-family:var(--mono);line-height:1.6}
 </style>
 </head>
@@ -68,14 +60,10 @@
     <div>
       <div class="tag-mono">Aqib · PM / PO / Delivery Manager</div>
       <h1>Job <em>Pipeline</em></h1>
-      <p class="sub">Live EU-sponsorship &amp; remote roles + UK roles, pulled from the Arbeitnow API, ranked against your profile. Review → tailor → apply.</p>
+      <p class="sub">EU-sponsorship &amp; remote roles + UK roles, refreshed automatically each day by a scheduled job — even while your laptop is closed.</p>
+      <div class="freshness" id="fresh">Loading…</div>
     </div>
-    <button class="btn" id="refresh">↻ Pull latest jobs</button>
   </header>
-
-  <div class="note" id="note">
-    <b>How this works:</b> This dashboard fetches live jobs directly in your browser. It ranks and filters them, but it does <b>not</b> auto-submit — you click "Apply" and submit on the company site (this keeps you off ban-lists and out of recruiter spam filters). To run it daily while your laptop is closed and check from your phone, see the deploy note at the bottom.
-  </div>
 
   <div class="controls">
     <input type="text" id="search" placeholder="filter: keyword, company, city…">
@@ -86,179 +74,105 @@
   </div>
 
   <div class="stats" id="stats"></div>
-  <div id="list"><div class="loader">Loading live jobs…</div></div>
-
+  <div id="list"><div class="loader">Loading jobs…</div></div>
   <footer id="foot"></footer>
 </div>
 
 <script>
-// ---------- Your profile (drives ranking) ----------
-const PROFILE = {
-  titles: ["product manager","product owner","delivery manager","program manager","project manager","product lead","technical product","associate product"],
-  skills: ["figma","ux","wireframe","game","agile","scrum","jira","roadmap","stakeholder","qa","backlog","sprint","saas","mobile","b2b","fintech","edtech"],
-  sponsorKeywords: ["visa","sponsor","relocation","relocate","blue card","work permit","international"],
-};
+let RAW=[], FILTER="all", doneSet=new Set();
+const SPONS=["visa","sponsor","relocation","relocate","blue card","work permit","international"];
+const TITLES=["product manager","product owner","delivery manager","program manager","project manager","product lead","technical product","associate product","producer","scrum master","delivery lead"];
 
-let RAW=[], FILTER="all", DONE=JSON.parse(localStorage_getSafe());
-function localStorage_getSafe(){return "[]";} // artifacts block storage; kept in-memory below
-let doneSet=new Set();
-
-function score(job){
-  const t=(job.title||"").toLowerCase();
-  const d=(job.description||"").toLowerCase();
-  const tags=(job.tags||[]).join(" ").toLowerCase();
-  const blob=t+" "+d+" "+tags;
-  let s=0, why=[];
-  // title match — heaviest weight
-  for(const tt of PROFILE.titles){ if(t.includes(tt)){ s+=40; why.push("title matches <b>"+tt+"</b>"); break; } }
-  if(s===0){ for(const tt of PROFILE.titles){ if(blob.includes(tt)){ s+=18; why.push("mentions "+tt); break; } } }
-  // skills
-  let sk=PROFILE.skills.filter(k=>blob.includes(k));
-  if(sk.length){ s+=Math.min(sk.length*6,30); why.push("skills: <b>"+sk.slice(0,4).join(", ")+"</b>"); }
-  // sponsorship signal
-  let sp=PROFILE.sponsorKeywords.filter(k=>blob.includes(k));
-  if(sp.length){ s+=20; }
-  // remote
-  if(job.remote){ s+=10; }
-  return {s,why,sk,sp:sp.length>0};
-}
-
-function isSponsor(job){
-  const blob=((job.title||"")+" "+(job.description||"")+" "+(job.tags||[]).join(" ")).toLowerCase();
-  return PROFILE.sponsorKeywords.some(k=>blob.includes(k));
-}
-function isPM(job){
-  const t=(job.title||"").toLowerCase();
-  return PROFILE.titles.some(tt=>t.includes(tt));
-}
+function isSponsor(j){const b=((j.title||"")+" "+(j.description||"")+" "+(j.tags||[]).join(" ")).toLowerCase();return SPONS.some(k=>b.includes(k));}
+function isPM(j){const t=(j.title||"").toLowerCase();return TITLES.some(tt=>t.includes(tt));}
+function esc(s){return (s||"").replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));}
 
 function render(){
   const q=document.getElementById('search').value.toLowerCase().trim();
-  let rows=RAW.map(j=>({...j,_sc:score(j)}))
-    .sort((a,b)=>b._sc.s-a._sc.s);
-
-  rows=rows.filter(j=>{
+  let rows=RAW.slice().sort((a,b)=>(b._score||0)-(a._score||0)).filter(j=>{
     if(FILTER==="remote" && !j.remote) return false;
     if(FILTER==="spons" && !isSponsor(j)) return false;
     if(FILTER==="pm" && !isPM(j)) return false;
-    if(q){ const blob=((j.title||"")+(j.company_name||"")+(j.location||"")).toLowerCase(); if(!blob.includes(q)) return false; }
+    if(q){const b=((j.title||"")+(j.company_name||"")+(j.location||"")).toLowerCase();if(!b.includes(q))return false;}
     return true;
   });
-
-  // stats
   const st=document.getElementById('stats');
-  const nRemote=RAW.filter(j=>j.remote).length;
-  const nSpons=RAW.filter(isSponsor).length;
-  const nPM=RAW.filter(isPM).length;
   st.innerHTML=`
-    <div class="stat"><div class="n">${RAW.length}</div><div class="l">Live jobs</div></div>
-    <div class="stat"><div class="n">${nPM}</div><div class="l">Product/Delivery</div></div>
-    <div class="stat"><div class="n">${nSpons}</div><div class="l">Likely sponsor</div></div>
-    <div class="stat"><div class="n">${nRemote}</div><div class="l">Remote</div></div>`;
-
+    <div class="stat"><div class="n">${RAW.length}</div><div class="l">Jobs</div></div>
+    <div class="stat"><div class="n">${RAW.filter(isPM).length}</div><div class="l">Product/Delivery</div></div>
+    <div class="stat"><div class="n">${RAW.filter(isSponsor).length}</div><div class="l">Likely sponsor</div></div>
+    <div class="stat"><div class="n">${RAW.filter(j=>j.remote).length}</div><div class="l">Remote</div></div>`;
   const list=document.getElementById('list');
-  if(!rows.length){ list.innerHTML='<div class="empty">No matches. Try "All" or clear the search.</div>'; return; }
-
-  list.innerHTML=rows.slice(0,80).map(j=>{
-    const id=j.slug||j.url;
-    const done=doneSet.has(id);
-    const badges=[];
+  if(!rows.length){list.innerHTML='<div class="empty">No matches. Try "All" or clear the search.</div>';return;}
+  list.innerHTML=rows.slice(0,100).map(j=>{
+    const id=j.slug||j.url, done=doneSet.has(id), badges=[];
     if(j.remote) badges.push('<span class="badge b-remote">Remote</span>');
     if(isSponsor(j)) badges.push('<span class="badge b-spons">Likely sponsor</span>');
     const loc=(j.location||"").toLowerCase();
     if(loc.includes("united kingdom")||loc.includes("london")||loc.includes("uk")) badges.push('<span class="badge b-uk">UK · no sponsor needed</span>');
-    (j.tags||[]).slice(0,3).forEach(t=>badges.push('<span class="badge b-tag">'+t+'</span>'));
-    const why=j._sc.why.length? j._sc.why.join(" · ") : "general match";
+    if(j.source) badges.push('<span class="badge b-src">'+esc(j.source)+(j.country&&j.country!=="EU"?" · "+esc(j.country):"")+'</span>');
+    (j.tags||[]).slice(0,3).forEach(t=>badges.push('<span class="badge b-tag">'+esc(t)+'</span>'));
+    const why=(j._why&&j._why.length)? j._why.join(" · ") : "general match";
     return `<div class="job">
-      <div class="score">${j._sc.s} pts</div>
+      <div class="score">${j._score||0} pts</div>
       <h3>${esc(j.title||"Untitled")}</h3>
       <div class="co">${esc(j.company_name||"")} · ${esc(j.location||"—")}</div>
       <div class="badges">${badges.join("")}</div>
-      <div class="why">Why ranked: ${why}</div>
+      <div class="why">Why ranked: ${esc(why)}</div>
       <div class="actions">
         <a class="apply" href="${j.url}" target="_blank" rel="noopener">Open &amp; apply ↗</a>
-        <button onclick="genCV('${esc(j.title||'')}','${esc(j.company_name||'')}')">Draft tailored CV brief</button>
-        <button class="${done?'done':''}" onclick="toggleDone('${cssEsc(id)}',this)">${done?'✓ Applied':'Mark applied'}</button>
+        <button onclick="genCV('${esc(j.title||'').replace(/'/g,"")}','${esc(j.company_name||'').replace(/'/g,"")}')">Draft tailored CV brief</button>
+        <button class="${done?'done':''}" onclick="toggleDone('${(id||'').replace(/'/g,"\\'")}',this)">${done?'✓ Applied':'Mark applied'}</button>
       </div>
     </div>`;
   }).join("");
 }
 
-function esc(s){return (s||"").replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));}
-function cssEsc(s){return (s||"").replace(/'/g,"\\'");}
-
 window.toggleDone=(id,btn)=>{
   if(doneSet.has(id)){doneSet.delete(id);btn.textContent="Mark applied";btn.classList.remove('done');}
   else{doneSet.add(id);btn.textContent="✓ Applied";btn.classList.add('done');}
 };
-
 window.genCV=(title,co)=>{
-  const brief=
-`TAILORED APPLICATION BRIEF — paste this to Claude to generate your CV + cover letter
+  const brief=`TAILORED APPLICATION BRIEF — paste this to Claude
 
 ROLE: ${title}
 COMPANY: ${co}
 
-Use my master profile. Weave in, where the JD allows:
+Use my master profile. Weave in where the JD allows:
 • Figma UX wireframes
 • Game design tasks (4 yrs, multiple shipped titles)
-• Art direction & coordination with artists on art styles
+• Art direction & coordination with artists
 • Developer coordination
 • QA & testing every build before release
-
 LinkedIn: linkedin.com/in/aqib-javed-pm
-Generate: (1) a 1-page tailored CV, (2) a short cover letter highlighting visa/relocation readiness if EU.`;
-  navigator.clipboard?.writeText(brief).then(()=>alert("CV brief copied to clipboard ✓\n\nPaste it into a new Claude chat to generate the tailored CV + cover letter for:\n\n"+title+" @ "+co)).catch(()=>prompt("Copy this brief:",brief));
+Generate: (1) a 1-page tailored CV, (2) a short cover letter, noting visa/relocation readiness if EU.`;
+  (navigator.clipboard?navigator.clipboard.writeText(brief):Promise.reject())
+    .then(()=>alert("CV brief copied ✓\nPaste into a new Claude chat for:\n\n"+title+" @ "+co))
+    .catch(()=>prompt("Copy this brief:",brief));
 };
-
-async function load(){
-  const btn=document.getElementById('refresh'); btn.disabled=true; btn.textContent="Pulling…";
-  document.getElementById('list').innerHTML='<div class="loader">Fetching live jobs from Arbeitnow…</div>';
-  try{
-    // The Arbeitnow API's CORS headers are unreliable from the browser,
-    // so we try direct first, then fall back to public CORS proxies.
-    const target=p=>'https://arbeitnow.com/api/job-board-api?page='+p;
-    const strategies=[
-      url=>url,                                                   // direct
-      url=>'https://corsproxy.io/?url='+encodeURIComponent(url),  // proxy 1
-      url=>'https://api.allorigins.win/raw?url='+encodeURIComponent(url), // proxy 2
-    ];
-
-    async function getPage(p){
-      let lastErr;
-      for(const wrap of strategies){
-        try{
-          const r=await fetch(wrap(target(p)));
-          if(!r.ok) throw new Error('HTTP '+r.status);
-          const j=await r.json();
-          if(j&&j.data) return j.data;
-          throw new Error('no data field');
-        }catch(e){ lastErr=e; }
-      }
-      throw lastErr;
-    }
-
-    let all=[];
-    for(let p=1;p<=3;p++){ all=all.concat(await getPage(p)); }
-    RAW=all;
-    render();
-  }catch(e){
-    document.getElementById('list').innerHTML='<div class="empty">Couldn\'t reach the live API ('+e.message+').<br>All sources (direct + proxies) failed — they may be temporarily down. Tap "Pull latest jobs" to retry.</div>';
-  }finally{ btn.disabled=false; btn.textContent="↻ Pull latest jobs"; }
-}
 
 document.querySelectorAll('.chip').forEach(c=>c.addEventListener('click',()=>{
   document.querySelectorAll('.chip').forEach(x=>x.classList.remove('on'));
-  c.classList.add('on'); FILTER=c.dataset.f; render();
+  c.classList.add('on');FILTER=c.dataset.f;render();
 }));
 document.getElementById('search').addEventListener('input',render);
-document.getElementById('refresh').addEventListener('click',load);
 
+async function load(){
+  try{
+    const r=await fetch('jobs.json?_='+Date.now()); // same-origin, no CORS
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const d=await r.json();
+    RAW=d.jobs||[];
+    const when=d.generated_at? new Date(d.generated_at).toLocaleString() : "unknown";
+    document.getElementById('fresh').textContent="Last refreshed: "+when+"  ·  "+RAW.length+" jobs";
+    render();
+  }catch(e){
+    document.getElementById('list').innerHTML='<div class="empty">No jobs.json yet ('+e.message+').<br>This appears after the GitHub Action runs once. Go to your repo → Actions tab → run "Update jobs daily" manually, then reload.</div>';
+  }
+}
 document.getElementById('foot').innerHTML=
-`SOURCE: arbeitnow.com/api/job-board-api (free, no-auth, EU + remote, visa-sponsorship focus, fed by Greenhouse/Lever ATS).<br>
-DEPLOY FOR 24/7 + PHONE: host this on a free static host (Netlify/Vercel/Cloudflare Pages) → open the URL on your phone anytime. For true scheduled pulls + email digests while your laptop is closed, add a free GitHub Actions cron job (instructions in chat).<br>
-RANKING is local heuristic matching against your PM/PO/Delivery profile — not a submission bot.`;
-
+`SOURCE: arbeitnow.com job API, fetched server-side by GitHub Actions (no CORS), ranked against your PM/PO/Delivery profile, written to jobs.json.<br>
+SCHEDULE: runs daily ~7am UK while your devices are off. Open this page on your phone anytime to see the latest pull. Not a submission bot — you click Apply on the company site.`;
 load();
 </script>
 </body>
